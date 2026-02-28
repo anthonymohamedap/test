@@ -3,10 +3,9 @@ using System.Threading.Tasks;
 
 namespace QuadroApp.Service.Interfaces
 {
-    public interface IOfferteWorkflowService
+    public interface IWorkflowService
     {
-        Task<int> BevestigAsync(int offerteId);
-        Task AnnuleerAsync(int offerteId);
         Task ChangeOfferteStatusAsync(int offerteId, OfferteStatus newStatus);
+        Task ChangeWerkBonStatusAsync(int werkBonId, WerkBonStatus newStatus);
     }
 }

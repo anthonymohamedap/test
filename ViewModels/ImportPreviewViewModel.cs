@@ -93,8 +93,7 @@ public partial class ImportPreviewViewModel : ObservableObject
             {
                 ["Artikelnummer"] = row.Artikelnummer,
                 ["Leverancier"] = row.Leverancier
-                ,
-                ["Levcode"] = row.Levcode
+                ,["Levcode"] = row.Levcode
             }));
         }
     }

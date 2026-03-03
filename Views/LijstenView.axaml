@@ -69,7 +69,7 @@
 									<TextBlock Grid.Column="5" Text="Serie" FontWeight="SemiBold"/>
 								</Grid>
 							</Border>
-							<ListBox ItemsSource="{Binding PagedLijsten}" SelectedItem="{Binding GeselecteerdeLijst, Mode=TwoWay}" SelectedItems="{Binding SelectedLijsten, Mode=TwoWay}" SelectionMode="Extended" BorderThickness="0" Background="Transparent">
+							<ListBox ItemsSource="{Binding PagedLijsten}" SelectedItem="{Binding GeselecteerdeLijst, Mode=TwoWay}" SelectedItems="{Binding SelectedLijsten, Mode=TwoWay}" SelectionMode="Multiple" BorderThickness="0" Background="Transparent">
 								<ListBox.ItemTemplate>
 									<DataTemplate x:DataType="m:TypeLijst">
 										<Border Padding="10,6">

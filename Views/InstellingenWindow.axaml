@@ -1,0 +1,37 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:QuadroApp.ViewModels"
+        x:Class="QuadroApp.Views.InstellingenWindow"
+        x:DataType="vm:InstellingenViewModel"
+        Width="520"
+        Height="500"
+        Title="⚙ Instellingen"
+        Background="#F5F5F5"
+        WindowStartupLocation="CenterOwner">
+
+    <Border Margin="20" Padding="20" Background="White" BorderBrush="#E0E0E0" BorderThickness="1" CornerRadius="10">
+        <StackPanel Spacing="14">
+            <TextBlock Text="⚙ Instellingen" FontSize="22" FontWeight="Bold" Foreground="#222"/>
+
+            <Separator/>
+            <TextBlock Text="Staaflijst Pricing" FontSize="18" FontWeight="SemiBold"/>
+            <Grid ColumnDefinitions="2*,3*" RowDefinitions="Auto,Auto" RowSpacing="8" ColumnSpacing="14">
+                <TextBlock Grid.Row="0" Text="StaaflijstWinstFactor" VerticalAlignment="Center" FontWeight="Bold"/>
+                <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding StaaflijstWinstFactor, Mode=TwoWay}"/>
+                <TextBlock Grid.Row="1" Text="StaaflijstAfvalPercentage" VerticalAlignment="Center" FontWeight="Bold"/>
+                <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding StaaflijstAfvalPercentage, Mode=TwoWay}"/>
+            </Grid>
+
+            <Separator/>
+            <TextBlock Text="Default Pricing" FontSize="18" FontWeight="SemiBold"/>
+            <Grid ColumnDefinitions="2*,3*" RowDefinitions="Auto,Auto" RowSpacing="8" ColumnSpacing="14">
+                <TextBlock Grid.Row="0" Text="DefaultWinstFactor" VerticalAlignment="Center" FontWeight="Bold"/>
+                <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding DefaultWinstFactor, Mode=TwoWay}"/>
+                <TextBlock Grid.Row="1" Text="DefaultAfvalPercentage" VerticalAlignment="Center" FontWeight="Bold"/>
+                <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding DefaultAfvalPercentage, Mode=TwoWay}"/>
+            </Grid>
+
+            <Button Content="Opslaan" Command="{Binding SaveCommand}" HorizontalAlignment="Right" Width="120" Background="#444A50" Foreground="White" FontWeight="Bold" CornerRadius="8" Padding="10,6" Margin="0,8,0,0"/>
+        </StackPanel>
+    </Border>
+</Window>

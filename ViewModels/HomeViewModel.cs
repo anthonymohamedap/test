@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using QuadroApp.Data;
 using QuadroApp.Service.Interfaces;
 using QuadroApp.Views;
@@ -23,6 +24,7 @@ namespace QuadroApp.ViewModels
         public IAsyncRelayCommand OpenAfwerkingsOptiesCommand { get; }
         public IAsyncRelayCommand OpenLeveranciersCommand { get; }
         public IAsyncRelayCommand OpenFacturenCommand { get; }
+        public IAsyncRelayCommand OpenInstellingenCommand { get; }
 
         public HomeViewModel(
             INavigationService nav,
@@ -45,8 +47,31 @@ namespace QuadroApp.ViewModels
             OpenOfferteCommand = new AsyncRelayCommand(() => _nav.NavigateToAsync<OfferteViewModel>());
             OpenOffertesLijstCommand = new AsyncRelayCommand(() => _nav.NavigateToAsync<OffertesLijstViewModel>());
             OpenFacturenCommand = new AsyncRelayCommand(() => _nav.NavigateToAsync<FacturenViewModel>());
+            OpenInstellingenCommand = new AsyncRelayCommand(OpenInstellingenAsync);
             _toast = toast;
             _statusWorkflow = statusWorkflow;
+        }
+
+
+        private static async Task OpenInstellingenAsync()
+        {
+            var vm = App.Services.GetRequiredService<InstellingenViewModel>();
+            await vm.InitializeAsync();
+
+            var window = new InstellingenWindow
+            {
+                DataContext = vm
+            };
+
+            if (App.Current?.ApplicationLifetime is
+                Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop)
+            {
+                var owner = desktop.MainWindow;
+                if (owner is null)
+                    return;
+
+                await window.ShowDialog(owner);
+            }
         }
 
         private async Task OpenPlanningAsync()

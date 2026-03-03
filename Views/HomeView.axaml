@@ -55,6 +55,10 @@
                             Command="{Binding OpenPlanningCommand}"
                             Classes="NavButton"/>
 
+					<Button Content="⚙ Instellingen"
+                            Command="{Binding OpenInstellingenCommand}"
+                            Classes="NavButton"/>
+
 				</StackPanel>
 
 				<!-- Footer -->
@@ -156,6 +160,20 @@
                                        Foreground="Black"
                                        FontWeight="SemiBold"/>
 							<TextBlock Text="Bekijk werkbezetting"
+                                       FontSize="12"
+                                       Foreground="#5F6C7B"/>
+						</StackPanel>
+					</Button>
+
+
+					<Button Classes="CardButton"
+                            Command="{Binding OpenInstellingenCommand}">
+						<StackPanel Spacing="6">
+							<TextBlock Text="⚙ Instellingen"
+                                       FontSize="16"
+                                       Foreground="Black"
+                                       FontWeight="SemiBold"/>
+							<TextBlock Text="Beheer globale pricing instellingen"
                                        FontSize="12"
                                        Foreground="#5F6C7B"/>
 						</StackPanel>

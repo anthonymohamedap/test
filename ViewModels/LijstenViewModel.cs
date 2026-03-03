@@ -27,6 +27,7 @@ public partial class LijstenViewModel : ObservableObject, IAsyncInitializable
     private readonly TypeLijstImportDefinition _typeLijstImportDefinition;
     private readonly ICrudValidator<TypeLijst> _validator;
     private readonly IToastService _toast;
+    private readonly IPricingSettingsProvider _pricingSettings;
     public TypeLijst? Selected => GeselecteerdeLijst;
     [ObservableProperty]
     private string? leverancierZoekterm;
@@ -128,7 +129,8 @@ public partial class LijstenViewModel : ObservableObject, IAsyncInitializable
         ILijstDialogService lijstDialog,
         TypeLijstImportDefinition typeLijstImportDefinition,
         ICrudValidator<TypeLijst> validator,
-        IToastService toast)
+        IToastService toast,
+        IPricingSettingsProvider pricingSettings)
     {
         _dbFactory = dbFactory;
         _nav = nav;
@@ -138,6 +140,7 @@ public partial class LijstenViewModel : ObservableObject, IAsyncInitializable
 
         _validator = validator;
         _toast = toast;
+        _pricingSettings = pricingSettings;
 
         // rest van jouw ctor...
 
@@ -295,10 +298,13 @@ public partial class LijstenViewModel : ObservableObject, IAsyncInitializable
     [ObservableProperty] private decimal breedte = 30m;
     [ObservableProperty] private decimal hoogte = 40m;
     [ObservableProperty] private decimal werkloon = 15m;
-    [ObservableProperty] private decimal staaflijstWinstFactor = 3.5m;
-    [ObservableProperty] private decimal staaflijstAfvalPercentage = 20m;
-    [ObservableProperty] private decimal defaultWinstFactor = 0m;
-    [ObservableProperty] private decimal defaultAfvalPercentage = 0m;
+    [ObservableProperty]
+    private ObservableCollection<TypeLijst> selectedLijsten = new();
+
+    private decimal _staaflijstWinstFactor = 3.5m;
+    private decimal _staaflijstAfvalPercentage = 20m;
+    private decimal _defaultWinstFactor = 0m;
+    private decimal _defaultAfvalPercentage = 0m;
 
     public string VerkoopPrijsPreview =>
         GeselecteerdeLijst == null
@@ -311,10 +317,10 @@ public partial class LijstenViewModel : ObservableObject, IAsyncInitializable
             breedteCm,
             hoogteCm,
             werkloon,
-            StaaflijstWinstFactor,
-            StaaflijstAfvalPercentage,
-            DefaultWinstFactor,
-            DefaultAfvalPercentage);
+            _staaflijstWinstFactor,
+            _staaflijstAfvalPercentage,
+            _defaultWinstFactor,
+            _defaultAfvalPercentage);
 
     [RelayCommand]
     private async Task LoadAsync()
@@ -331,10 +337,10 @@ public partial class LijstenViewModel : ObservableObject, IAsyncInitializable
             await using var db = await _dbFactory.CreateDbContextAsync();
             Log("DbContext created");
 
-            StaaflijstWinstFactor = await ReadDecimalInstellingAsync(db, "StaaflijstWinstFactor", 3.5m);
-            StaaflijstAfvalPercentage = await ReadDecimalInstellingAsync(db, "StaaflijstAfvalPercentage", 20m);
-            DefaultWinstFactor = await ReadDecimalInstellingAsync(db, "DefaultWinstFactor", 0m);
-            DefaultAfvalPercentage = await ReadDecimalInstellingAsync(db, "DefaultAfvalPercentage", 0m);
+            _staaflijstWinstFactor = await _pricingSettings.GetStaaflijstWinstFactorAsync();
+            _staaflijstAfvalPercentage = await _pricingSettings.GetStaaflijstAfvalPercentageAsync();
+            _defaultWinstFactor = await _pricingSettings.GetDefaultWinstFactorAsync();
+            _defaultAfvalPercentage = await _pricingSettings.GetDefaultAfvalPercentageAsync();
 
             Log("Loading leveranciers...");
             Leveranciers = await db.Leveranciers
@@ -357,6 +363,7 @@ public partial class LijstenViewModel : ObservableObject, IAsyncInitializable
             FilteredLijsten = new ObservableCollection<TypeLijst>(Lijsten);
             Log($"FilteredLijsten set. Count={FilteredLijsten.Count}");
             GefilterdeLeveranciers = new ObservableCollection<Leverancier>(Leveranciers);
+            SelectedLijsten = new ObservableCollection<TypeLijst>();
 
             // ✅ Sync SelectedLeverancier met huidige lijst (indien detail open is)
             SyncSelectedLeverancierFromLijst();
@@ -613,6 +620,56 @@ public partial class LijstenViewModel : ObservableObject, IAsyncInitializable
         }
 
     }
+
+    partial void OnSelectedLijstenChanged(ObservableCollection<TypeLijst> value)
+    {
+        BulkPrijsUpdateCommand.NotifyCanExecuteChanged();
+        HerberekenSelectieCommand.NotifyCanExecuteChanged();
+    }
+
+    private bool CanRunBulkActions() => SelectedLijsten.Count > 0;
+
+    [RelayCommand(CanExecute = nameof(CanRunBulkActions))]
+    private async Task BulkPrijsUpdateAsync()
+    {
+        if (GeselecteerdeLijst is null)
+        {
+            _toast.Warning("Selecteer eerst een bronlijst in de details.");
+            return;
+        }
+
+        var targets = SelectedLijsten.Where(x => x.Id != GeselecteerdeLijst.Id).ToList();
+        if (targets.Count == 0)
+        {
+            _toast.Warning("Geen extra lijsten geselecteerd voor bulk update.");
+            return;
+        }
+
+        await using var db = await _dbFactory.CreateDbContextAsync();
+        foreach (var item in targets)
+        {
+            var entity = await db.TypeLijsten.FirstOrDefaultAsync(x => x.Id == item.Id);
+            if (entity is null) continue;
+
+            entity.PrijsPerMeter = GeselecteerdeLijst.PrijsPerMeter;
+            entity.VasteKost = GeselecteerdeLijst.VasteKost;
+            entity.WerkMinuten = GeselecteerdeLijst.WerkMinuten;
+            entity.InventarisKost = GeselecteerdeLijst.InventarisKost;
+            entity.LaatsteUpdate = DateTime.Now;
+        }
+
+        await db.SaveChangesAsync();
+        _toast.Success("Bulk prijs update uitgevoerd.");
+        await LoadAsync();
+    }
+
+    [RelayCommand(CanExecute = nameof(CanRunBulkActions))]
+    private async Task HerberekenSelectieAsync()
+    {
+        await LoadAsync();
+        _toast.Success("Selectie herberekend.");
+    }
+
     partial void OnLeverancierZoektermChanged(string? value)
     {
         FilterLeveranciers();
@@ -646,47 +703,4 @@ public partial class LijstenViewModel : ObservableObject, IAsyncInitializable
 
 
 
-    [RelayCommand]
-    private async Task SaveInstellingenAsync()
-    {
-        if (StaaflijstWinstFactor < 0 || StaaflijstAfvalPercentage < 0 || DefaultWinstFactor < 0 || DefaultAfvalPercentage < 0)
-        {
-            await _dialogs.ShowErrorAsync("Ongeldige instellingen", "Waarden moeten groter dan of gelijk aan 0 zijn.");
-            return;
-        }
-
-        await using var db = await _dbFactory.CreateDbContextAsync();
-        SaveInstelling(db, "StaaflijstWinstFactor", StaaflijstWinstFactor);
-        SaveInstelling(db, "StaaflijstAfvalPercentage", StaaflijstAfvalPercentage);
-        SaveInstelling(db, "DefaultWinstFactor", DefaultWinstFactor);
-        SaveInstelling(db, "DefaultAfvalPercentage", DefaultAfvalPercentage);
-        await db.SaveChangesAsync();
-
-        OnPropertyChanged(nameof(VerkoopPrijsPreview));
-        _toast.Success("Prijsinstellingen opgeslagen");
-    }
-
-    private static async Task<decimal> ReadDecimalInstellingAsync(AppDbContext db, string sleutel, decimal fallback)
-    {
-        var value = await db.Instellingen
-            .AsNoTracking()
-            .Where(x => x.Sleutel == sleutel)
-            .Select(x => x.Waarde)
-            .FirstOrDefaultAsync();
-
-        return decimal.TryParse(value, out var parsed) ? parsed : fallback;
-    }
-
-    private static void SaveInstelling(AppDbContext db, string sleutel, decimal waarde)
-    {
-        var valueText = waarde.ToString(System.Globalization.CultureInfo.InvariantCulture);
-        var item = db.Instellingen.FirstOrDefault(x => x.Sleutel == sleutel);
-        if (item is null)
-        {
-            db.Instellingen.Add(new Instelling { Sleutel = sleutel, Waarde = valueText });
-            return;
-        }
-
-        item.Waarde = valueText;
-    }
 }

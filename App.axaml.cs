@@ -149,6 +149,7 @@ public partial class App : Application
         services.AddTransient<KlantDetailViewModel>();
         services.AddTransient<WerkBonLijstViewModel>();
         services.AddTransient<FacturenViewModel>();
+        services.AddTransient<InstellingenViewModel>();
 
         Services = services.BuildServiceProvider();
 

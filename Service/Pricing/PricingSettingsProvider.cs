@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using QuadroApp.Data;
+using QuadroApp.Model.DB;
 using QuadroApp.Service.Interfaces;
 using System.Globalization;
 using System.Linq;
@@ -41,6 +42,18 @@ public sealed class PricingSettingsProvider : IPricingSettingsProvider
     public async Task<decimal> GetDefaultAfvalPercentageAsync() =>
         await GetDecimalSettingAsync("DefaultAfvalPercentage", DefaultAfvalPercentage);
 
+    public async Task SaveStaaflijstWinstFactorAsync(decimal value) =>
+        await SaveDecimalSettingAsync("StaaflijstWinstFactor", value);
+
+    public async Task SaveStaaflijstAfvalPercentageAsync(decimal value) =>
+        await SaveDecimalSettingAsync("StaaflijstAfvalPercentage", value);
+
+    public async Task SaveDefaultWinstFactorAsync(decimal value) =>
+        await SaveDecimalSettingAsync("DefaultWinstFactor", value);
+
+    public async Task SaveDefaultAfvalPercentageAsync(decimal value) =>
+        await SaveDecimalSettingAsync("DefaultAfvalPercentage", value);
+
     private async Task<decimal> GetDecimalSettingAsync(string key, decimal fallback)
     {
         await using var db = await _dbFactory.CreateDbContextAsync();
@@ -60,5 +73,23 @@ public sealed class PricingSettingsProvider : IPricingSettingsProvider
             return parsed;
 
         return fallback;
+    }
+
+    private async Task SaveDecimalSettingAsync(string key, decimal value)
+    {
+        await using var db = await _dbFactory.CreateDbContextAsync();
+        var entry = await db.Instellingen.FirstOrDefaultAsync(x => x.Sleutel == key);
+        var text = value.ToString(CultureInfo.InvariantCulture);
+
+        if (entry is null)
+        {
+            db.Instellingen.Add(new Instelling { Sleutel = key, Waarde = text });
+        }
+        else
+        {
+            entry.Waarde = text;
+        }
+
+        await db.SaveChangesAsync();
     }
 }

@@ -16,16 +16,15 @@
 
 				<TextBox Text="{Binding Artikelnummer}" Watermark="Artikelnummer"/>
 				<TextBox Text="{Binding Levcode}" Watermark="Levcode"/>
+				<TextBox Text="{Binding Leverancier.Naam}" Watermark="Leverancier" IsReadOnly="True"/>
 				<TextBox Text="{Binding Soort}" Watermark="Soort"/>
 				<TextBox Text="{Binding Serie}" Watermark="Serie"/>
 				<NumericUpDown Value="{Binding BreedteCm}" Minimum="0" Maximum="100" Increment="1"/>
+				<NumericUpDown Value="{Binding VoorraadMeter}" Increment="0.5"/>
+				<NumericUpDown Value="{Binding InventarisKost}" Increment="0.1"/>
 				<NumericUpDown Value="{Binding PrijsPerMeter}" Increment="0.1"/>
 				<NumericUpDown Value="{Binding VasteKost}" Increment="0.5"/>
 				<NumericUpDown Value="{Binding WerkMinuten}" Increment="1"/>
-				<NumericUpDown Value="{Binding VoorraadMeter}" Increment="0.5"/>
-				<NumericUpDown Value="{Binding MinimumVoorraad}" Increment="0.5"/>
-				<NumericUpDown Value="{Binding InventarisKost}" Increment="0.1"/>
-				<TextBox Text="{Binding Opmerking}" AcceptsReturn="True" Height="90"/>
 
 				<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="0,10,0,0">
 					<Button Content="Annuleren" Width="100" Background="#999" Foreground="White" Click="Annuleer_Click"/>

@@ -5,16 +5,16 @@ using QuadroApp.ViewModels;
 
 namespace QuadroApp.Views;
 
-public partial class LijstenView : UserControl
+public partial class BulkLijstenWindow : Window
 {
-    public LijstenView()
+    public BulkLijstenWindow()
     {
         InitializeComponent();
     }
 
-    private void LijstenList_SelectionChanged(object? sender, SelectionChangedEventArgs e)
+    private void BulkLijstenList_SelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
-        if (DataContext is not LijstenViewModel vm || sender is not ListBox listBox)
+        if (DataContext is not BulkLijstenViewModel vm || sender is not ListBox listBox)
         {
             return;
         }

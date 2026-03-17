@@ -5,7 +5,10 @@
       "Bash(cd \"C:\\\\Users\\\\anthony mohamed\\\\Documents\\\\werk\\\\QuadroApp\\\\QuadroApp\\\\QuadroApp\\\\test\" && dotnet build 2>&1 | tail -30)",
       "Bash(ls \"C:\\\\Users\\\\anthony mohamed\\\\Documents\\\\werk\\\\QuadroApp\\\\QuadroApp\\\\QuadroApp\\\\test\"/*.csproj 2>/dev/null || ls \"C:\\\\Users\\\\anthony mohamed\\\\Documents\\\\werk\\\\QuadroApp\\\\QuadroApp\\\\QuadroApp\\\\test\"/*.sln 2>/dev/null)",
       "Bash(cd \"C:\\\\Users\\\\anthony mohamed\\\\Documents\\\\werk\\\\QuadroApp\\\\QuadroApp\\\\QuadroApp\\\\test\" && dotnet build QuadroApp.csproj 2>&1 | tail -30)",
-      "Bash(cd \"C:\\\\Users\\\\anthony mohamed\\\\Documents\\\\werk\\\\QuadroApp\\\\QuadroApp\\\\QuadroApp\\\\test\" && dotnet build QuadroApp.csproj 2>&1 | grep -E \"^.*error\" | grep -v \"MSB3027\\\\|MSB3021\")"
+      "Bash(cd \"C:\\\\Users\\\\anthony mohamed\\\\Documents\\\\werk\\\\QuadroApp\\\\QuadroApp\\\\QuadroApp\\\\test\" && dotnet build QuadroApp.csproj 2>&1 | grep -E \"^.*error\" | grep -v \"MSB3027\\\\|MSB3021\")",
+      "Bash(find:*)",
+      "Bash(ls:*)",
+      "Bash(grep:*)"
     ]
   }
 }

@@ -6,27 +6,25 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace QuadroApp.Migrations
 {
     /// <inheritdoc />
-    public partial class Fixes : Migration
+    public partial class AddTitelToOfferteRegel : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            // Schema already applied to database — no-op to sync migration history.
-            migrationBuilder.Sql("SELECT 1;");
+            migrationBuilder.AddColumn<string>(
+                name: "Titel",
+                table: "OfferteRegels",
+                type: "TEXT",
+                maxLength: 200,
+                nullable: true);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "FactuurLijnen");
-
-            migrationBuilder.DropTable(
-                name: "Facturen");
-
             migrationBuilder.DropColumn(
-                name: "AfvalPercentage",
-                table: "AfwerkingsOpties");
+                name: "Titel",
+                table: "OfferteRegels");
         }
     }
 }
